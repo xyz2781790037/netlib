@@ -1,7 +1,10 @@
 #ifndef NONCOPYABLE_H
 #define NONCOPYABLE_H
+
 #include <iostream>
 #include <ctime>
+#include <sys/time.h>
+
 const int kMicroSecondsPerSecond = 1000000;
 namespace muduo{
     namespace base{
@@ -18,9 +21,10 @@ namespace muduo{
             std::string toFormattedString(bool showMicroseconds = true) const;
             inline Timestamp addTime(Timestamp timestamp, double seconds);
             inline double timeDifference(Timestamp high, Timestamp low);
-            bool operator==(const Timestamp) const;
-            bool operator<(const Timestamp) const;
-            bool operator>(const Timestamp) const;
+            
+            bool operator==(const Timestamp that) const;
+            bool operator<(const Timestamp that) const;
+            bool operator>(const Timestamp that) const;
             ~Timestamp() = default;
 
         private:
@@ -28,4 +32,5 @@ namespace muduo{
         };
     }
 }
+
 #endif
