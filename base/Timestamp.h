@@ -6,7 +6,7 @@
 #include <sys/time.h>
 
 const int kMicroSecondsPerSecond = 1000000;
-namespace muduo{
+namespace mulib{
     namespace base{
         class Timestamp{
         public:

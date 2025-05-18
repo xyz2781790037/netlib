@@ -1,8 +1,10 @@
+#pragma once
+
 #include <iostream>
 #include <sstream>
 #define MAX_STRING_SIZE 4096
-namespace muduo{
-    namespace log{
+namespace mulib{
+    namespace base{
         class LogStream{
         public:
             template <typename T>
@@ -26,11 +28,11 @@ namespace muduo{
                 return false;
             }
             std::string buffer_;
-            
+
         };
     }
 }
-using namespace muduo::log;
+using namespace mulib::base;
 template <typename T>
 LogStream &LogStream::operator<<(const T &val)
 {

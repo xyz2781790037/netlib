@@ -1,7 +1,7 @@
 #ifndef NONCOPYABLE_H
 #define NONCOPYABLE_H
 
-namespace muduo{
+namespace mulib{
     class noncopyable{
     public:
         noncopyable(noncopyable &) = delete;
