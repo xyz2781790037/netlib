@@ -18,7 +18,7 @@ int64_t Timestamp::microSecondsSinceEpoch() const{
 time_t Timestamp::secondsSinceEpoch() const{
     return static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond);
 }
-std::string Timestamp::toFormattedString(bool showMicroseconds = true) const{
+std::string Timestamp::toFormattedString(bool showMicroseconds) const{
     if(!showMicroseconds){
         return "0";
     }

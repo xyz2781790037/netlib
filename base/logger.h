@@ -2,9 +2,11 @@
 
 #include "logStream.h"
 #include "Timestamp.h"
-#include "noncopyable.h"
-
+#include <iostream>
 #include <time.h>
+#include <cstring>
+
+#include "noncopyable.h"
 
 #define LOG_TRACE                                          \
     if (mulib::base::Logger::logLevel() <= mulib::base::Logger::TRACE) \
@@ -42,7 +44,6 @@ namespace mulib
                 template <int N>
                 SourceFile(const char (&arr)[N]); // 用于记录 __FILE__
                 explicit SourceFile(const char *filename);
-
                 const char *data_;
                 int size_;
             };
@@ -50,23 +51,23 @@ namespace mulib
             Logger(SourceFile file, int line, LogLevel level);
             Logger(SourceFile file, int line, LogLevel level, const char *func);
             Logger(SourceFile file, int line, bool toAbort); // SYSFATAL 日志
-
-            ~Logger();
-
             LogStream &stream(); // 获取流式日志输入
-
-            static LogLevel logLevel();
-            static void setLogLevel(LogLevel level);
+            LogLevel logLevel();
+            void setLogLevel(LogLevel level);
 
             typedef void (*OutputFunc)(const char *msg, int len);
             typedef void (*FlushFunc)();
             static void setOutput(OutputFunc);
             static void setFlush(FlushFunc);
+
+            ~Logger();
+
         private:
             class Impl{
             public:
                 Impl(LogLevel level, int savedErrno, const SourceFile &file, int line);
                 void formatTime();
+                void formatLevel();
                 void finish();
 
                 mulib::base::Timestamp time_;
