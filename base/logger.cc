@@ -34,23 +34,23 @@ void Logger::Impl::formatLevel()
     switch (level_)
     {
     case TRACE:
-        stream_ << "[TRACE] ";
+        stream_ << "\033[36m" << "[TRACE] " << "\033[0m";
         break;
     case DEBUG:
-        stream_ << "[DEBUG] ";
-        break;
+        stream_ << "\033[34m" << "[DEBUG] " << "\033[0m";
+            break;
     case INFO:
-        stream_ << "[INFO ] ";
-        break;
+        stream_ << "\033[32m" << "[INFO] " << "\033[0m";
+            break;
     case WARN:
-        stream_ << "[WARN ] ";
-        break;
+        stream_ << "\033[33m" << "[WARN] " << "\033[0m";
+            break;
     case ERROR:
-        stream_ << "[ERROR] ";
-        break;
+        stream_ << "\033[31m" << "[ERROR] " << "\033[0m";
+            break;
     case FATAL:
-        stream_ << "[FATAL] ";
-        break;
+        stream_ << "\033[35m" << "[FATAL] " << "\033[0m";
+            break;
     default:
         stream_ << "[UNKWN] ";
         break;
@@ -81,4 +81,33 @@ Logger::LogLevel Logger::logLevel()
 void Logger::setLogLevel(Logger::LogLevel level)
 {
     g_logLevel = level;
+}
+Logger::~Logger()
+{
+    // 有问题
+    impl_.finish(); // 补充文件名、行号等结尾信息
+
+    const std::string &msg = impl_.stream_.str();
+
+    if (OutputFunc())
+    {
+        // OutputFunc(msg.c_str(), static_cast<int>(msg.size()));
+    }
+    else
+    {
+        fwrite(msg.c_str(), 1, msg.size(), stdout);
+    }
+
+    if (impl_.level_ == FATAL)
+    {
+        if (FlushFunc())
+        {
+            FlushFunc();
+        }
+        else
+        {
+            fflush(stdout);
+        }
+        abort(); // FATAL 日志：程序终止
+    }
 }

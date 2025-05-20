@@ -1,14 +1,17 @@
 #ifndef NONCOPYABLE_H
 #define NONCOPYABLE_H
 
-namespace mulib{
+namespace mulib
+{
     class noncopyable{
     public:
-        noncopyable(noncopyable &) = delete;
-        noncopyable operator=(noncopyable &) = delete;
+        noncopyable(const noncopyable &) = delete;
+        noncopyable &operator=(const noncopyable &) = delete;
+
     protected:
         noncopyable() = default;
         ~noncopyable() = default;
     };
 }
-#endif
+
+#endif // NONCOPYABLE_H

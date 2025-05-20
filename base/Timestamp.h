@@ -1,5 +1,5 @@
-#ifndef NONCOPYABLE_H
-#define NONCOPYABLE_H
+#ifndef TIMESTAMP_H
+#define TIMESTAMP_H
 
 #include <iostream>
 #include <ctime>

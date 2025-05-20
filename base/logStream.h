@@ -2,10 +2,12 @@
 
 #include <iostream>
 #include <sstream>
+#include "noncopyable.h"
 #define MAX_STRING_SIZE 4096
 namespace mulib{
     namespace base{
-        class LogStream{
+        class LogStream : noncopyable
+        {
         public:
             template <typename T>
             LogStream &operator<<(const T &val);
