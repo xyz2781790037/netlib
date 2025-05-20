@@ -7,7 +7,6 @@
 #include <functional>
 #include <atomic>
 
-
 namespace mulib{
     using base::Timestamp;
     namespace net{
@@ -25,12 +24,12 @@ namespace mulib{
             static int64_t numCreated();
 
         private:
-            const TimerCallback callback_;
-            Timestamp expiration_;
-            const double interval_;
-            const bool repeat_;
+            const TimerCallback callback_; // 定时器触发时要调用的回调函数
+            Timestamp expiration_;         // 当前这次触发的时间点
+            const double interval_;        // 表示定时器的触发间隔，单位为秒。
+            const bool repeat_;            // 是否是周期性定时器
 
-            const int64_t sequence_;
+            const int64_t sequence_; // 每创建一个 Timer，这个号就会递增
             static std::atomic<int64_t> s_numCreated;
         };
     }
