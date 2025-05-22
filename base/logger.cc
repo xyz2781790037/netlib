@@ -1,15 +1,5 @@
 #include "logger.h"
 using namespace mulib::base;
-template <int N>
-Logger::SourceFile::SourceFile(const char (&arr)[N]) : data_(arr), size_(N - 1) // 用于接收固定长度数组的引用
-{
-    const char *slash = strrchr(data_, '/');
-    if (slash)
-    {
-        data_ = slash + 1;
-        size_ -= static_cast<int>(data_ - arr);
-    }
-}
 Logger::SourceFile::SourceFile(const char *filename) : data_(filename){
     const char *slash = strrchr(filename, '/');
     if(slash){
@@ -57,7 +47,7 @@ void Logger::Impl::formatLevel()
     }
 }
 void Logger::Impl::finish(){
-    stream_ << "-" << basename_.data_ << ':' << line_ << '\n';
+    stream_ << " -" << basename_.data_ << ':' << line_ << '\n';
 }
 Logger::Logger(SourceFile file, int line) : impl_(INFO, 0, file, line)
 {}
@@ -89,25 +79,25 @@ Logger::~Logger()
 
     const std::string &msg = impl_.stream_.str();
 
-    if (OutputFunc())
-    {
-        // OutputFunc(msg.c_str(), static_cast<int>(msg.size()));
-    }
-    else
-    {
+    // if (OutputFunc())
+    // {
+    //     // OutputFunc(msg.c_str(), static_cast<int>(msg.size()));
+    // }
+    // else
+    // {
         fwrite(msg.c_str(), 1, msg.size(), stdout);
-    }
+    // }
 
     if (impl_.level_ == FATAL)
     {
-        if (FlushFunc())
-        {
-            FlushFunc();
-        }
-        else
-        {
+    //     if (FlushFunc())
+    //     {
+    //         FlushFunc();
+    //     }
+    //     else
+    //     {
             fflush(stdout);
-        }
+    //     }
         abort(); // FATAL 日志：程序终止
     }
 }

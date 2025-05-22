@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MUDUO_BASE_LOGGING_H
+#define MUDUO_BASE_LOGGING_H
 
 #include "logStream.h"
 #include "Timestamp.h"
@@ -55,10 +56,10 @@ namespace mulib
             LogLevel logLevel();
             void setLogLevel(LogLevel level);
 
-            typedef void (*OutputFunc)(const char *msg, int len);
-            typedef void (*FlushFunc)();
-            static void setOutput(OutputFunc);
-            static void setFlush(FlushFunc);
+            // typedef void (*OutputFunc)(const char *msg, int len);
+            // typedef void (*FlushFunc)();
+            // static void setOutput(OutputFunc);
+            // static void setFlush(FlushFunc);
 
             ~Logger();
 
@@ -81,3 +82,16 @@ namespace mulib
         };
     }
 }
+
+using namespace mulib::base;
+template <int N>
+Logger::SourceFile::SourceFile(const char (&arr)[N]) : data_(arr), size_(N - 1) // 用于接收固定长度数组的引用
+{
+    const char *slash = strrchr(data_, '/');
+    if (slash)
+    {
+        data_ = slash + 1;
+        size_ -= static_cast<int>(data_ - arr);
+    }
+}
+#endif

@@ -38,6 +38,7 @@ namespace mulib{
 
             int index();
             void set_index(int idx);
+            EventLoop *ownerLoop();
 
         private:
             void update();
@@ -58,6 +59,3 @@ namespace mulib{
     }
 }
 #endif
-using namespace mulib::net;
-Channel::Channel(EventLoop *loop, int fd) : 
-loop_(loop),fd_(fd),events_(kNoneEvent),revents_(kNoneEvent),index_(-1){}
