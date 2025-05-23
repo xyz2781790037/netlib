@@ -15,3 +15,7 @@ TimerQueue::TimerQueue(EventLoop *loop)
       timerfd_(createTimerfd()),
       timerfdChannel_(loop, timerfd_),
       timers_() {}
+
+int TimerQueue::createTimerfd(){
+    return timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
+}

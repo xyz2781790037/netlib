@@ -12,18 +12,17 @@
 #define LOG_TRACE                                          \
     if (mulib::base::Logger::logLevel() <= mulib::base::Logger::TRACE) \
     mulib::base::Logger(__FILE__, __LINE__, mulib::base::Logger::TRACE, __func__).stream()
-
 #define LOG_DEBUG                                          \
     if (mulib::base::Logger::logLevel() <= mulib::base::Logger::DEBUG) \
     mulib::base::Logger(__FILE__, __LINE__, mulib::base::Logger::DEBUG, __func__).stream()
-
 #define LOG_INFO                                          \
     if (mulib::base::Logger::logLevel() <= mulib::base::Logger::INFO) \
     mulib::base::Logger(__FILE__, __LINE__).stream()
-
 #define LOG_WARN mulib::base::Logger(__FILE__, __LINE__, mulib::base::Logger::WARN).stream()
 #define LOG_ERROR mulib::base::Logger(__FILE__, __LINE__, mulib::base::Logger::ERROR).stream()
 #define LOG_FATAL mulib::base::Logger(__FILE__, __LINE__, mulib::base::Logger::FATAL).stream()
+#define LOG_SYSERR mulib::base::Logger(__FILE__, __LINE__, false).stream()
+#define LOG_SYSFATAL mulib::base::Logger(__FILE__, __LINE__, true).stream()
 
 namespace mulib
 {
@@ -53,7 +52,7 @@ namespace mulib
             Logger(SourceFile file, int line, LogLevel level, const char *func);
             Logger(SourceFile file, int line, bool toAbort); // SYSFATAL 日志
             LogStream &stream(); // 获取流式日志输入
-            LogLevel logLevel();
+            static LogLevel logLevel();
             void setLogLevel(LogLevel level);
 
             // typedef void (*OutputFunc)(const char *msg, int len);

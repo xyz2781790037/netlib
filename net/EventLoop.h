@@ -38,6 +38,7 @@ namespace mulib{
             void runInLoop(const Functor &cb);
             void queueInLoop(const Functor &cb);
             void wakeup();
+            int createEventfd();
 
         private:
             void abortNotInLoopThread();
@@ -50,7 +51,7 @@ namespace mulib{
             std::atomic<bool> quit_; // 是否退出循环，线程安全
             int64_t iteration_;      // 循环次数，调试或统计用
             Timestamp pollReturnTime_; // 每轮 poll 返回时间戳，用于定时器判断等
-            const pid_t threadId_;     // 创建该 EventLoop 的线程 id，用于线程检查
+            const std::thread::id threadId_; // 创建该 EventLoop 的线程 id，用于线程检查
 
             std::unique_ptr<Epoller> poller_;
             ChannelList activeChannels_; // 本轮 epoll 触发的 Channel 列表

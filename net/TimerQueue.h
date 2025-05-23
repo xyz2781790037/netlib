@@ -26,7 +26,9 @@ namespace mulib{
             using ActiveTimer = std::pair<Timer *, int64_t>;
             using ActiveTimerSet = std::set<ActiveTimer>;
 
+            // 在事件循环中添加定时器
             void addTimerInLoop(Timer *timer);
+            
             void cancelInLoop(TimerId timerid);
             void handleRead();
             std::vector<Entry> getExpired(Timestamp now);
