@@ -90,3 +90,48 @@ void EventLoop::wakeup(){
         LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
     }
 }
+void EventLoop::queueInLoop(const Functor &cb)
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        pendingFunctors_.emplace_back(cb); // 加入待执行队列
+    }
+
+    // 如果不是在本线程，或者正在调用 functors（说明是嵌套），就唤醒 EventLoop
+    if (!isInLoopThread() || callingPendingFunctors_)
+    {
+        wakeup();
+    }
+}
+
+int EventLoop::createEventfd(){
+    int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if (evtfd < 0)
+    {
+        LOG_SYSERR << "Failed in eventfd";
+        abort(); // 或者抛出异常
+    }
+    return evtfd;
+}
+
+void EventLoop::handleRead(){
+    uint64_t one = 1;
+    ssize_t n = ::read(wakeupFd_, &one, sizeof one);
+    if (n != sizeof(one))
+    {
+        LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+    }
+} // 读出写进 eventfd 的值，清空事件，避免 epoll 一直触发。
+void EventLoop::doPendingFunctors(){
+    std::vector<Functor> functors;
+    callingPendingFunctors_ = true;
+    {
+        std::unique_lock lock(mutex_);
+        functors.swap(pendingFunctors_);
+    }
+    for(auto functor : functors){
+        functor();
+    }
+
+    callingPendingFunctors_ = false;
+}
