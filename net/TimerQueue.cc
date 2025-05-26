@@ -3,6 +3,7 @@
 #include "TimerId.h"
 #include <algorithm>
 #include "../base/Timestamp.h"
+#include "../base/logger.h"
 #include <sys/timerfd.h>
 #include <assert.h>
 #include <unistd.h>
@@ -53,12 +54,32 @@ bool TimerQueue::insert(Timer *timer){
     assert(timers_.size() == activeTimers_.size());
     return earliestChanged;
 }
-void TimerQueue::resetTimerfd(int timerfd, Timestamp expiration){
+namespace mulib{
+    namespace net{
+        struct timespec howMuchTimeFromNow(Timestamp when){
+            int64_t microseconds = when.microSecondsSinceEpoch() - Timestamp::now().microSecondsSinceEpoch();
+            if(microseconds < 100){
+            microseconds = 100;
+            }
+            timespec ts;
+            ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicroSecondsPerSecond);
+            ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicroSecondsPerSecond) * 1000);
+            return ts;
+        }
+    }
+}
+
+void TimerQueue::resetTimerfd(int timerfd, Timestamp expiration)
+{
     itimerspec newValue;
     itimerspec oldValue;
     bzero(&newValue, sizeof(newValue));
     bzero(&oldValue, sizeof(oldValue));
-    newValue.it_value = 
+    newValue.it_value = howMuchTimeFromNow(expiration);
+    int ret = ::timerfd_settime(timerfd, 0, &newValue, &oldValue);
+    if(ret){
+        LOG_SYSERR << "timerfd_settime()";
+    }
 }
 void TimerQueue::addTimerInLoop(Timer *timer){
     loop_->assertInLoopThread();
@@ -66,4 +87,7 @@ void TimerQueue::addTimerInLoop(Timer *timer){
     if(earliestChanged){
         resetTimerfd(timerfd_, timer->expiration());
     }
+}
+void TimerQueue::cancelInLoop(TimerId timerid){
+    
 }

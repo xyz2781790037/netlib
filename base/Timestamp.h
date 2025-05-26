@@ -5,11 +5,11 @@
 #include <ctime>
 #include <sys/time.h>
 
-const int kMicroSecondsPerSecond = 1000000;
 namespace mulib{
     namespace base{
         class Timestamp{
         public:
+            static const int kMicroSecondsPerSecond = 1000000;
             Timestamp() : microSecondsSinceEpoch_(0) {}
             explicit Timestamp(int64_t microSecondsSinceEpochArg)
                 : microSecondsSinceEpoch_(microSecondsSinceEpochArg) {}
