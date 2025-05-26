@@ -64,6 +64,7 @@ namespace mulib{
 
             int wakeupFd_;
             std::unique_ptr<Channel> wakeupChannel_;
+            std::unique_ptr<TimerQueue> timerQueue_;
         };
     }
 }

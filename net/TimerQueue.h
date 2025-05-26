@@ -44,8 +44,8 @@ namespace mulib{
 
             TimerList timers_;
 
+            ActiveTimerSet activeTimers_;
             bool callingExpiredTimers_;
-            ActiveTimerSet activeTimerset_;
             ActiveTimerSet cancelingTimers_;
             int createTimerfd();
         };

@@ -19,7 +19,7 @@ namespace mulib{
             int64_t microSecondsSinceEpoch() const;
             time_t secondsSinceEpoch() const;
             std::string toFormattedString(bool showMicroseconds = true) const;
-            inline Timestamp addTime(Timestamp timestamp, double seconds);
+            static Timestamp addTime(Timestamp timestamp, double seconds);
             inline double timeDifference(Timestamp high, Timestamp low);
             
             bool operator==(const Timestamp that) const;

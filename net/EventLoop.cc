@@ -135,3 +135,27 @@ void EventLoop::doPendingFunctors(){
 
     callingPendingFunctors_ = false;
 }
+
+void EventLoop::updateChannel(Channel *channel){
+    poller_->updateChannel(channel);
+}
+void EventLoop::removeChannel(Channel *channel){
+    poller_->removeChannel(channel);
+}
+
+TimerId EventLoop::runAt(const Timestamp &time, const Timer::TimerCallback &cb){
+    return timerQueue_->addTimer(cb, time, 0);
+}
+TimerId EventLoop::runAfter(double delay, const Timer::TimerCallback &cb){
+    
+    Timestamp time(Timestamp::addTime(Timestamp::now(), delay));
+    return runAt(time, cb);
+} // 非静态成员函数或变量必须依附于某个具体对象
+TimerId EventLoop::runEvery(double interval, const Timer::TimerCallback &cb){
+
+    Timestamp time(Timestamp::addTime(Timestamp::now(), interval));
+    return timerQueue_->addTimer(cb, time, interval);
+}
+void EventLoop::cancel(TimerId id){
+    return timerQueue_->cancel(id);
+}
