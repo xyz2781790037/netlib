@@ -45,8 +45,9 @@ namespace mulib{
             TimerList timers_;
 
             ActiveTimerSet activeTimers_;
-            bool callingExpiredTimers_;
-            ActiveTimerSet cancelingTimers_;
+            
+            bool callingExpiredTimers_;// 标志位，表示当前是否正在处理回调，避免取消时冲突
+            ActiveTimerSet cancelingTimers_; // 存放那些“即将回调”但被取消的定时器，防止回调执行
             int createTimerfd();
         };
     }

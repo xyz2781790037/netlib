@@ -89,5 +89,80 @@ void TimerQueue::addTimerInLoop(Timer *timer){
     }
 }
 void TimerQueue::cancelInLoop(TimerId timerid){
-    
+    loop_->assertInLoopThread();
+    assert(timers_.size() == activeTimers_.size());
+    ActiveTimer timer(timerid.timer_, timerid.sequence_);
+    ActiveTimerSet::iterator it = activeTimers_.find(timer);
+    if(it != activeTimers_.end()){
+        size_t n = timers_.erase(Entry(it->first->expiration(), it->first));
+        assert(n == 1);
+        (void)n;
+        
+        activeTimers_.erase(it);// 反顺序
+        delete it->first;
+    }else if (callingExpiredTimers_)
+    {
+        cancelingTimers_.insert(timer);
+    }
+    assert(timers_.size() == activeTimers_.size());
+}
+void TimerQueue::handleRead(){
+    loop_->assertInLoopThread();
+    Timestamp now(Timestamp::now());
+    std::vector<Entry> expired = getExpired(now);
+    callingExpiredTimers_ = true;
+    cancelingTimers_.clear();
+    for(auto& it : expired){
+        it.second->run();
+    }
+    callingExpiredTimers_ = false;
+    reset(expired, now);
+}
+std::vector<mulib::net::TimerQueue::Entry> TimerQueue::getExpired(Timestamp now){
+    assert(timers_.size() == activeTimers_.size());
+    std::vector<mulib::net::TimerQueue::Entry> expired;
+    Entry sentry(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
+    TimerList::iterator end = timers_.lower_bound(sentry);
+
+    assert(end == timers_.end() || now < end->first);
+    std::copy(timers_.begin(), end, back_inserter(expired));
+    timers_.erase(timers_.begin(), end);
+
+    for (const Entry &it : expired)
+    {
+        ActiveTimer timer(it.second, it.second->sequence());
+        size_t n = activeTimers_.erase(timer);
+        assert(n == 1);
+        (void)n;
+    }
+
+    assert(timers_.size() == activeTimers_.size());
+    return expired;
+}
+void TimerQueue::reset(const std::vector<Entry> &expired, Timestamp now){
+    Timestamp nextExpire;
+    for(auto& it : expired){
+        ActiveTimer timer(it.second, it.second->sequence());
+        if(it.second->repeat() && cancelingTimers_.find(timer) == cancelingTimers_.end()){
+            it.second->restart(now);
+            insert(it.second);
+        }
+        else{
+            delete it.second;
+        }    
+    }
+    if(!timers_.empty()){
+        nextExpire = timers_.begin()->second->expiration();
+    }
+    if (nextExpire.valid())
+    {
+        resetTimerfd(timerfd_, nextExpire);
+    }
+}
+TimerQueue::~TimerQueue(){
+    ::close(timerfd_);
+    for (const Entry &timer : timers_)
+    {
+        delete timer.second;
+    }
 }
