@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <assert.h>
 
 namespace mulib{
     namespace net{
@@ -17,7 +16,7 @@ namespace mulib{
             size_t prependableBytes() const;
 
             void swap(Buffer &rhs);
-            const char *peek() const;
+            const char *peek() const; // 返回当前可读数据的指针
 
             void retrieve(size_t len);
             void retrieveUntil(const char *end);
@@ -35,6 +34,18 @@ namespace mulib{
 
             void prepend(const void *data, size_t len);
             size_t internalCapacity() const;
+            ssize_t readFd(int, int *saveErrno);
+        
+        private:
+            char *begin();
+
+            const char *begin() const;
+
+            void makeSpace(size_t len);
+
+            std::vector<char> buffer_;
+            size_t readerIndex_; // 读指针，指向当前可读数据的起始位置
+            size_t writerIndex_; // 写指针，指向当前可写数据的起始位置
         };
     }
 }
