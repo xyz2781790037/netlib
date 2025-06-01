@@ -18,6 +18,7 @@ namespace mulib{
             using MessageCallback = std::function<void(const TcpConnectionPtr &, Buffer *, Timestamp)>;
             using WriteCompleteCallback = std::function<void(const TcpConnectionPtr &)>;
             using CloseCallback = std::function<void(const TcpConnectionPtr &)>;
+            using HighWaterMarkCallback = std::function<void(const TcpConnectionPtr &, size_t)>;
 
             TcpConnection(EventLoop *loop, std::string conName, int sockfd, InetAddress localAddr, InetAddress peerAddr);
             ~TcpConnection();
@@ -32,6 +33,10 @@ namespace mulib{
             void setMessageCallback(MessageCallback cb) { messageCallback_ = cb; }
             void setWriteCompleteCallback(WriteCompleteCallback cb) { writeCompleteCallback_ = cb; }
             void setCloseCallback(CloseCallback cb) { closeCallback_ = cb; }
+            void setHighWaterMarkCallback(const HighWaterMarkCallback &cb, size_t highWaterMark){
+                highWaterMarkCallback_ = cb;
+                highWaterMark_ = highWaterMark;
+            } // 当发送缓冲区大小超过 highWaterMark 阈值时触发
 
             void connectEstablished();
             void connectDestroyed();
@@ -68,7 +73,9 @@ namespace mulib{
             MessageCallback messageCallback_;
             WriteCompleteCallback writeCompleteCallback_;
             CloseCallback closeCallback_;
+            HighWaterMarkCallback highWaterMarkCallback_;
 
+            size_t highWaterMark_;
             Buffer inputBuffer_;
             Buffer outputBuffer_;
         };

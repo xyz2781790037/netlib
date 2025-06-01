@@ -61,8 +61,10 @@ void TcpConnection::send(const std::string &message){
             sendInLoop(message);
         }
         else{
-            loop_->runInLoop([this, &message]()
-                             { sendInLoop(std::move(message)); });
+            std::shared_ptr<TcpConnection> self = shared_from_this();
+            loop_->runInLoop([self, message]() {
+                self->sendInLoop(message);
+            });
         }
     }
 }
@@ -81,36 +83,90 @@ void TcpConnection::shutdownInLoop(){
         socket_->shutdownWrite();
     }
 } // 只关闭写端，防止对面还在发消息
-void TcpConnection::sendInLoop(const std::string &message){
+// void TcpConnection::sendInLoop(const std::string &message){
+//     loop_->assertInLoopThread();
+//     ssize_t nwrote = 0;
+//     if (state_ == kDisconnected){
+//         LOG_WARN << "disconnected, give up writing";
+//         return;
+//     }
+//     if (!channel_->isWriting() && outputBuffer_.readableBytes() == 0){
+//         nwrote = ::write(channel_->fd(), message.data(), message.size());
+//         if (nwrote >= 0){
+//             if (static_cast<size_t>(nwrote) < message.size()){
+//                 LOG_WARN << "data not fully written";
+//             }
+//             else if (writeCompleteCallback_){
+//                 loop_->queueInLoop([this]()
+//                                    { writeCompleteCallback_(shared_from_this()); });
+//             }
+//         }
+//         else{
+//             nwrote = 0;
+//             if (errno != EWOULDBLOCK) // 对端 socket 的发送缓冲区满了
+//             {
+//                 LOG_SYSERR << "TcpConnection::sendInLoop: send failed";
+//             }
+//         }
+//     }
+//     assert(nwrote >= 0);
+//     if (static_cast<size_t>(nwrote) < message.size())
+//     {
+//         outputBuffer_.append(message.data() + nwrote, message.size() - nwrote);
+//         if (!channel_->isWriting())
+//         {
+//             channel_->enableWriting();
+//         }
+//     }
+// }
+void TcpConnection::sendInLoop(const std::string &data)
+{
     loop_->assertInLoopThread();
+    assert(channel_ != nullptr);
     ssize_t nwrote = 0;
-    if (state_ == kDisconnected){
+    int len = data.size();
+    size_t remaining = data.size();
+    bool faultError = false;
+    if (state_ == kDisconnected)
+    {
         LOG_WARN << "disconnected, give up writing";
         return;
     }
-    if (!channel_->isWriting() && outputBuffer_.readableBytes() == 0){
-        nwrote = ::write(channel_->fd(), message.data(), message.size());
-        if (nwrote >= 0){
-            if (static_cast<size_t>(nwrote) < message.size()){
-                LOG_WARN << "data not fully written";
-            }
-            else if (writeCompleteCallback_){
-                loop_->queueInLoop([this]()
-                                   { writeCompleteCallback_(shared_from_this()); });
+    // if no thing in output queue, try writing directly
+    if (!channel_->isWriting() && outputBuffer_.readableBytes() == 0)
+    {
+        nwrote = ::write(channel_->fd(), data.data(), len);
+        if (nwrote >= 0)
+        {
+            remaining = len - nwrote;
+            if (remaining == 0 && writeCompleteCallback_)
+            {
+                loop_->queueInLoop(std::bind(writeCompleteCallback_, shared_from_this()));
             }
         }
-        else{
+        else // nwrote < 0
+        {
             nwrote = 0;
-            if (errno != EWOULDBLOCK) // 对端 socket 的发送缓冲区满了
+            if (errno != EWOULDBLOCK)
             {
-                LOG_SYSERR << "TcpConnection::sendInLoop: send failed";
+                LOG_SYSERR << "TcpConnection::sendInLoop";
+                if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
+                {
+                    faultError = true;
+                }
             }
         }
     }
-    assert(nwrote > 0);
-    if (static_cast<size_t>(nwrote) < message.size())
+
+    assert(remaining <= len);
+    if (!faultError && remaining > 0)
     {
-        outputBuffer_.append(message.data() + nwrote, message.size() - nwrote);
+        size_t oldLen = outputBuffer_.readableBytes();
+        if (oldLen + remaining >= highWaterMark_ && oldLen < highWaterMark_ && highWaterMarkCallback_)
+        {
+            loop_->queueInLoop(std::bind(highWaterMarkCallback_, shared_from_this(), oldLen + remaining));
+        }
+        outputBuffer_.append(static_cast<const char *>(data.data()) + nwrote, remaining);
         if (!channel_->isWriting())
         {
             channel_->enableWriting();
