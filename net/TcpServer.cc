@@ -5,6 +5,7 @@ using namespace mulib::net;
 
 TcpServer::TcpServer(EventLoop *loop, std::string nameArg,const InetAddress &listenAddr) : loop_(loop), 
 name_(nameArg),
+ipPort_(listenAddr.toIpPort()),
 acceptor_(new Acceptor(loop,listenAddr)),
 threadpool_(new EventLoopThreadPool(loop)),
 connectionCallback_(),
@@ -30,7 +31,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress &peerAddr){
     loop_->assertInLoopThread();
     EventLoop *ioLoop = threadpool_->getNextLoop();
     char buff[32];
-    snprintf(buff, sizeof(buff), "#%d", nextConnId_);
+    snprintf(buff, sizeof(buff), "-%s#%d", ipPort_.c_str() ,nextConnId_);
     ++nextConnId_;
     std::string connName = name_ + buff;
     LOG_INFO << "TcpServer::newConnection [" << name_ << "] - new connection [" << connName << "] form " << peerAddr.toHostPort().c_str();

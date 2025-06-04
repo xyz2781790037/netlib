@@ -29,8 +29,10 @@ namespace mulib
             void start();
 
             void setThreadNum(int numThreads);
+            const std::string &ipPort() const { return ipPort_; }
             void setConnectionCallback(const ConnectionCallback &cb) { connectionCallback_ = cb; };
             void setMessageCallback(const MessageCallback &cb) { messageCallback_ = cb; };
+            // const InetAddress &getListenAddress() const { return acceptor_->listenAddress(); }
 
         private:
             void newConnection(int sockfd, const InetAddress &peerAddr);
@@ -38,6 +40,7 @@ namespace mulib
             void removeConnectionInLoop(const TcpConnectionPtr &conn);
 
             EventLoop *loop_;
+            const std::string ipPort_;
             const std::string name_;
             std::unique_ptr<Acceptor> acceptor_;
             std::shared_ptr<EventLoopThreadPool> threadpool_;
