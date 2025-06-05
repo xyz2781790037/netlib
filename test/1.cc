@@ -8,7 +8,7 @@ int main(){
     addr.sin_port = 10;
     if (bind(fd, (sockaddr *)&addr, sizeof(addr)) < 0)
     {
-        LOG_ERROR << "my" << std::endl;
+        LOG_ERROR << "my";
     }
 
     return 0;
