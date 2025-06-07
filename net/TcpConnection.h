@@ -54,7 +54,7 @@ namespace mulib{
             void handleError();
             void sendInLoop(const std::string &msg);
             void shutdownInLoop();
-
+            const char *stateToString() const;
             EventLoop *loop_; // 此连接所属的 EventLoop
             std::string name_;
             StateE state_;
@@ -72,6 +72,6 @@ namespace mulib{
             Buffer outputBuffer_;
         };
     }
-    }
+}
 
 #endif
