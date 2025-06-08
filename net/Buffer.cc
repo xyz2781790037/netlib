@@ -90,6 +90,7 @@ void Buffer::prepend(const void *data, size_t len){
 size_t Buffer::internalCapacity() const{
     return buffer_.capacity();
 }
+// 从文件描述符（通常是 socket）读取数据，填充到 Buffer 中（readfd)
 ssize_t Buffer::readFd(int fd, int *saveErrno){
     char extrabuf[65535];
     iovec vec[2];
