@@ -2,9 +2,9 @@
 #include <errno.h>
 #include <unistd.h>
 
-const int _knew = -1;
-const int _kadded = 1;
-const int _kdel_ed = 2;
+const int _knew = -1; // Channel 从没添加进 poller
+const int _kadded = 1; // 已添加
+const int _kdelete = 2; // 曾经添加过，现在删除了
 using namespace mulib::net;
 using ChannelList = std::vector<Channel *>;
 Epoller::Epoller(EventLoop *loop) :
@@ -44,6 +44,18 @@ void Epoller::fillActiveChannels(int numEvents, ChannelList &activeChannels) con
         activeChannels.push_back(channel);
     }
 }
+void Epoller::updateChannel(Channel *channel){
+    assertInLoopThread();
+    int index = channel->index();
+    if(index == _knew || index == _kdelete){
+        int fd = channel->fd();
+        if(index == _knew){
+            channels_[fd] = channel;
+        }
+        channel->set_index(_kadded);
+        update(EPOLL_CTL_ADD, channel);
+    }
+}
 void Epoller::removeChannel(Channel *channel)
 {
     assertInLoopThread();
@@ -55,4 +67,19 @@ void Epoller::removeChannel(Channel *channel)
         update(EPOLL_CTL_DEL, channel);
     }
     channel->set_index(_knew);
+}
+void Epoller::update(int opt, Channel *channel){
+    ::epoll_event event;
+    memset(&event, 0, sizeof(event));
+    event.events = channel->events();
+    event.data.ptr = channel;
+    int fd = channel->fd();
+    if (::epoll_ctl(epollfd_, opt, fd, &event) < 0){
+        if (opt == EPOLL_CTL_DEL){
+            LOG_ERROR << "Epoller::epoll : delete error";
+        }
+        else{
+            LOG_ERROR << "Epoller::epoll : add / mod error";
+        }
+    }
 }
