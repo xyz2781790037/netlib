@@ -92,3 +92,17 @@ bool socket::isSelfConnect(int sockfd){
     sockaddr_in peer = getPeerAddr(sockfd);
     return (local.sin_port == peer.sin_port) && (local.sin_addr.s_addr == peer.sin_addr.s_addr);
 }
+void socket::fromHostPort(const char *ip, uint16_t port, struct sockaddr_in *addr){
+    addr->sin_family = AF_INET;
+    addr->sin_port = htons(port);
+    if (::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0)
+    {
+        LOG_SYSERR << "sockets::fromHostPort";
+    }
+}
+void socket::toHostPort(char *buf, size_t size, const struct sockaddr_in &addr){
+    char host[INET_ADDRSTRLEN] = "INVALID"; // 如果 inet_ntop 失败，host 仍然是 "INVALID"
+    ::inet_ntop(AF_INET, &addr.sin_addr, host, sizeof host);
+    uint16_t port = ntohs(addr.sin_port);
+    snprintf(buf, size, "%s:%u", host, port);
+}

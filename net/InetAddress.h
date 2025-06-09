@@ -4,6 +4,7 @@
 #include <string>
 #include <arpa/inet.h>
 #include <memory.h>
+#include "SocketOps.h"
 
 namespace mulib{
     namespace net{
@@ -17,25 +18,32 @@ namespace mulib{
                 return addr_;
             }
             socklen_t getSockLen() const { return sizeof(addr_); };
+            std::string toHostPort() const;
+
         private:
             sockaddr_in addr_;
         };
     }
 }
 using namespace mulib::net;
-InetAddress::InetAddress(unsigned int port = 0){
+inline InetAddress::InetAddress(unsigned int port){
     memset(&addr_, 0, getSockLen());
     addr_.sin_family = AF_INET;
     addr_.sin_port = htons(port);
     addr_.sin_addr.s_addr = INADDR_ANY;
 }
-InetAddress::InetAddress(const std::string &ip, unsigned int port){
+inline InetAddress::InetAddress(const std::string &ip, unsigned int port){
     memset(&addr_, 0, getSockLen());
     addr_.sin_family = AF_INET;
     inet_pton(AF_INET, ip.c_str(), &addr_.sin_addr);
     addr_.sin_port = htons(port);
 }
-InetAddress::InetAddress(const sockaddr_in &addr){
+inline InetAddress::InetAddress(const sockaddr_in &addr){
     memcpy(&addr_, &addr, sizeof(addr_));
+}
+inline std::string InetAddress::toHostPort() const{
+    char buf[32];
+    socket::toHostPort(buf, sizeof buf, addr_);
+    return buf;
 }
 #endif

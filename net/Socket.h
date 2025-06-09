@@ -30,20 +30,20 @@ namespace mulib{
     }
 }
 using namespace mulib::net;
-Socket::~Socket(){
+inline Socket::~Socket(){
     socket::close(sockfd_);
 }
-void Socket::bindAddress(const InetAddress &localaddr){
+inline void Socket::bindAddress(const InetAddress &localaddr){
     socket::bindOrDie(sockfd_, localaddr.getSockAddr());
 }
 
-void Socket::listen() const{
+inline void Socket::listen() const{
     socket::listenOrDie(sockfd_);
 }
-void Socket::shutdownWrite() const{
+inline void Socket::shutdownWrite() const{
     socket::shutdownWrite(sockfd_);
 }
-int Socket::accept(InetAddress *peeraddr){
+inline int Socket::accept(InetAddress *peeraddr){
     struct sockaddr_in addr;
     memset(&addr, 0,sizeof(addr));
     int connfd = socket::accept(sockfd_, &addr);
@@ -53,13 +53,13 @@ int Socket::accept(InetAddress *peeraddr){
     }
     return connfd;
 }
-void Socket::setTcpNoDelay(bool on)
+inline void Socket::setTcpNoDelay(bool on)
 {
     int optval = on ? 1 : 0;
     ::setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 }
 
-void Socket::setReuseAddr(bool on)
+inline void Socket::setReuseAddr(bool on)
 {
     int optval = on ? 1 : 0;
     ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));

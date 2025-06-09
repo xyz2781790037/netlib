@@ -9,23 +9,23 @@
 namespace mulib{
     namespace net{
         class EventLoop;
-        class Channel : mulib::noncopyable{
+        class Channel : noncopyable{
         public:
             using EventCallback = std::function<void()>;
             using ReadEventCallback = std::function<void(base::Timestamp)>;
 
             Channel(EventLoop *loop, int fd);
-            ~Channel();
+            ~Channel(){};
             void handleEvent(base::Timestamp);
-            inline void setReadCallback(const ReadEventCallback &cb);
-            inline void setWriteCallback(const EventCallback &cb);
-            inline void setErrorCallback(const EventCallback &cb);
-            inline void setCloseCallback(const EventCallback &cb);
+            void setReadCallback(const ReadEventCallback &cb);
+            void setWriteCallback(const EventCallback &cb);
+            void setErrorCallback(const EventCallback &cb);
+            void setCloseCallback(const EventCallback &cb);
 
-            inline int fd() const;
-            inline int events() const;
-            inline void set_revents(int revt);
-            inline bool isNoneEvent() const;
+            int fd() const;
+            int events() const;
+            void set_revents(int revt);
+            bool isNoneEvent() const;
 
             void enableReading();
             void disableReading();
@@ -39,6 +39,7 @@ namespace mulib{
             int index();
             void set_index(int idx);
             EventLoop *ownerLoop();
+            void setRevents(int revent) { revents_ = revent; };
 
         private:
             void update();
@@ -49,7 +50,7 @@ namespace mulib{
             const int fd_;    // 被监听的文件描述符
             int events_;      // 当前监听的事件（EPOLLIN / EPOLLOUT 等）
             int revents_;     // 实际发生的事件（由 Poller 设置）
-            int index_;       // Poller 中使用的索引
+            int index_;       // Poller 中使用的状态
 
             ReadEventCallback readCallback_;
             EventCallback writeCallback_;

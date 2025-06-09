@@ -21,6 +21,9 @@ namespace mulib{
             sockaddr_in getLocalAddr(int sockfd);
             sockaddr_in getPeerAddr(int sockfd);
             bool isSelfConnect(int sockfd);
+
+            void fromHostPort(const char *ip, uint16_t port, struct sockaddr_in *addr);
+            void toHostPort(char *buf, size_t size, const struct sockaddr_in &addr);
         }
     }
 }

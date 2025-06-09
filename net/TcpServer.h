@@ -1,5 +1,5 @@
-#ifndef TCPSERVER_H
-#define TCPSERVER_H
+#ifndef MUDUO_NET_TCPSERVER_H
+#define MUDUO_NET_TCPSERVER_H
 
 #include "../base/noncopyable.h"
 #include "EventLoop.h"
@@ -24,7 +24,7 @@ namespace mulib
 
         public:
             TcpServer(EventLoop *loop, const InetAddress &listenAddr);
-            ~TcpServer();
+            ~TcpServer() {}
 
             void start();
 

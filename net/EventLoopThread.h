@@ -28,7 +28,7 @@ namespace mulib{
 
 #endif
 using namespace mulib::net;
-EventLoop *EventLoopThread::startLoop()
+inline EventLoop *EventLoopThread::startLoop()
 {
     thread_ = std::thread([this]
                           { threadFunc(); });
@@ -41,7 +41,7 @@ EventLoop *EventLoopThread::startLoop()
 
     return loop_;
 }
-EventLoopThread::~EventLoopThread(){
+inline EventLoopThread::~EventLoopThread(){
     exiting_ = true;
     if (loop_ != nullptr)
     {
@@ -49,7 +49,7 @@ EventLoopThread::~EventLoopThread(){
     }
     thread_.join();
 }
-void EventLoopThread::threadFunc(){
+inline void EventLoopThread::threadFunc(){
     EventLoop loop;
     {
         std::unique_lock lock(mutex_);

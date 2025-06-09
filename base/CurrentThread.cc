@@ -4,7 +4,7 @@
 
 namespace mulib{
     namespace CurrentThread{
-        extern __thread int t_cachedTid;
+        extern __thread int t_cachedTid = 0;
         pid_t tid()
         {
             if (t_cachedTid == 0)

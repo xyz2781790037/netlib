@@ -4,6 +4,8 @@
 #include "../base/Timestamp.h"
 #include "../base/noncopyable.h"
 #include "../base/logger.h"
+#include "Channel.h"
+#include "EventLoop.h"
 #include <vector>
 #include <sys/epoll.h>
 #include <map>
@@ -19,7 +21,7 @@ namespace mulib{
             ~Epoller();
             base::Timestamp poll(int timeoutMs, ChannelList &activeChannels);
 
-            void assertInLoopThread(){}
+            void assertInLoopThread() { ownerLoop_->assertInLoopThread(); }
             void updateChannel(Channel *channel);
             void removeChannel(Channel *channel);
 
