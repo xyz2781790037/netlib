@@ -17,8 +17,7 @@ void socket::bindOrDie(int sockfd, const sockaddr_in &addr){
         LOG_FATAL << "SocketOps: Bind failed";
     }
 }
-void socket::listenOrDie(int sockfd)
-{
+void socket::listenOrDie(int sockfd){
     int stat = ::listen(sockfd, SOMAXCONN);
     if (stat < 0)
     {
@@ -102,7 +101,7 @@ void socket::fromHostPort(const char *ip, uint16_t port, struct sockaddr_in *add
 }
 void socket::toHostPort(char *buf, size_t size, const struct sockaddr_in &addr){
     char host[INET_ADDRSTRLEN] = "INVALID"; // 如果 inet_ntop 失败，host 仍然是 "INVALID"
-    ::inet_ntop(AF_INET, &addr.sin_addr, host, sizeof host);
+    ::inet_ntop(AF_INET, &addr.sin_addr, host, sizeof(host));
     uint16_t port = ntohs(addr.sin_port);
     snprintf(buf, size, "%s:%u", host, port);
 }

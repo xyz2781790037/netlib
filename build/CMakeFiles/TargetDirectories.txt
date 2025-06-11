@@ -1,0 +1,3 @@
+/home/zgyx/netlib/build/CMakeFiles/netlib_test.dir
+/home/zgyx/netlib/build/CMakeFiles/edit_cache.dir
+/home/zgyx/netlib/build/CMakeFiles/rebuild_cache.dir

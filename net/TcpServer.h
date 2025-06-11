@@ -23,7 +23,7 @@ namespace mulib
             using WriteCompleteCallback = std::function<void(const TcpConnectionPtr &)>;
 
         public:
-            TcpServer(EventLoop *loop, const InetAddress &listenAddr);
+            TcpServer(EventLoop *loop, std::string nameArg, const InetAddress &listenAddr);
             ~TcpServer() {}
 
             void start();

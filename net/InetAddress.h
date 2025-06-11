@@ -43,7 +43,7 @@ inline InetAddress::InetAddress(const sockaddr_in &addr){
 }
 inline std::string InetAddress::toHostPort() const{
     char buf[32];
-    socket::toHostPort(buf, sizeof buf, addr_);
+    socket::toHostPort(buf, sizeof(buf), addr_);
     return buf;
 }
 #endif

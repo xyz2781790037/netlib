@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/netlib_test.dir/base/CurrentThread.cc.o"
+  "CMakeFiles/netlib_test.dir/base/CurrentThread.cc.o.d"
+  "CMakeFiles/netlib_test.dir/base/Timestamp.cc.o"
+  "CMakeFiles/netlib_test.dir/base/Timestamp.cc.o.d"
+  "CMakeFiles/netlib_test.dir/base/logStream.cc.o"
+  "CMakeFiles/netlib_test.dir/base/logStream.cc.o.d"
+  "CMakeFiles/netlib_test.dir/base/logger.cc.o"
+  "CMakeFiles/netlib_test.dir/base/logger.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/Acceptor.cc.o"
+  "CMakeFiles/netlib_test.dir/net/Acceptor.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/Buffer.cc.o"
+  "CMakeFiles/netlib_test.dir/net/Buffer.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/Channel.cc.o"
+  "CMakeFiles/netlib_test.dir/net/Channel.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/Epoller.cc.o"
+  "CMakeFiles/netlib_test.dir/net/Epoller.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/EventLoop.cc.o"
+  "CMakeFiles/netlib_test.dir/net/EventLoop.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/EventLoopThreadpool.cc.o"
+  "CMakeFiles/netlib_test.dir/net/EventLoopThreadpool.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/SocketOps.cc.o"
+  "CMakeFiles/netlib_test.dir/net/SocketOps.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/TcpConnection.cc.o"
+  "CMakeFiles/netlib_test.dir/net/TcpConnection.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/TcpServer.cc.o"
+  "CMakeFiles/netlib_test.dir/net/TcpServer.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/Timer.cc.o"
+  "CMakeFiles/netlib_test.dir/net/Timer.cc.o.d"
+  "CMakeFiles/netlib_test.dir/net/TimerQueue.cc.o"
+  "CMakeFiles/netlib_test.dir/net/TimerQueue.cc.o.d"
+  "CMakeFiles/netlib_test.dir/test/server.cc.o"
+  "CMakeFiles/netlib_test.dir/test/server.cc.o.d"
+  "netlib_test"
+  "netlib_test.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/netlib_test.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

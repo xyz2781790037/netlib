@@ -3,7 +3,8 @@
 #include <assert.h>
 using namespace mulib::net;
 
-TcpServer::TcpServer(EventLoop *loop, const InetAddress &listenAddr) : loop_(loop), 
+TcpServer::TcpServer(EventLoop *loop, std::string nameArg,const InetAddress &listenAddr) : loop_(loop), 
+name_(nameArg),
 acceptor_(new Acceptor(loop,listenAddr)),
 threadpool_(new EventLoopThreadPool(loop)),
 connectionCallback_(),

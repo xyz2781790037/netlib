@@ -23,11 +23,10 @@ int main()
 {
     net::EventLoop mainLoop;
     net::InetAddress addr(8080);
-    net::TcpServer server(&mainLoop, addr);
-
+    net::TcpServer server(&mainLoop, "G", addr);
     server.setThreadNum(32);
     server.start();
-    server.setConnectionCallback(onConnection);
+    server.setConnectionCallback(onClose);
 
     mainLoop.loop(-1);
 

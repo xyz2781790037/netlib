@@ -51,6 +51,7 @@ void EventLoop::loop(int timeout = -1){
         }
         doPendingFunctors();
     }
+    looping_ = false;
 }
 void EventLoop::quit(){
     quit_ = true;
