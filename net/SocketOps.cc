@@ -1,6 +1,7 @@
 #include "SocketOps.h"
 #include "../base/logger.h"
 #include <fcntl.h>
+#include <assert.h>
 using namespace mulib::net;
 
 int socket::createNonblockingOrDie(){
@@ -28,6 +29,15 @@ int socket::accept(int sockfd,sockaddr_in* addr){
     socklen_t len = sizeof(*addr);
     int ret = ::accept4(sockfd, reinterpret_cast<sockaddr *>(&addr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
     if(ret < 0){
+        LOG_FATAL << "SocketOps: Accept failed";
+    }
+    return ret;
+}
+int socket::accept1(int sockfd, sockaddr_in *addr){
+    socklen_t len = sizeof(*addr);
+    int ret = ::accept4(sockfd, reinterpret_cast<sockaddr *>(&addr), &len, SOCK_CLOEXEC);
+    if (ret < 0)
+    {
         LOG_FATAL << "SocketOps: Accept failed";
     }
     return ret;
@@ -104,4 +114,17 @@ void socket::toHostPort(char *buf, size_t size, const struct sockaddr_in &addr){
     ::inet_ntop(AF_INET, &addr.sin_addr, host, sizeof(host));
     uint16_t port = ntohs(addr.sin_port);
     snprintf(buf, size, "%s:%u", host, port);
+}
+void socket::toIpPort(char *buf, size_t size, const struct sockaddr *addr){
+    toIp(buf, size, addr);
+    size_t end = ::strlen(buf);
+    const struct sockaddr_in *addr4 = reinterpret_cast<const struct sockaddr_in *>(addr);
+    uint16_t port = ntohs(addr4->sin_port);
+    assert(size > end);
+    snprintf(buf + end, size - end, ":%u", port);
+}
+void socket::toIp(char* buf, size_t size,const struct sockaddr* addr){
+    assert(size >= INET_ADDRSTRLEN);
+    const struct sockaddr_in *addr4 = reinterpret_cast<const struct sockaddr_in *>(addr);
+    ::inet_ntop(AF_INET, &addr4->sin_addr, buf, static_cast<socklen_t>(size));
 }

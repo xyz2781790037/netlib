@@ -19,6 +19,7 @@ namespace mulib{
             void bindAddress(const InetAddress &localaddr);
             void listen() const;
             int accept(InetAddress *peeraddr);
+            int accept1(InetAddress *peeraddr);
 
             void setTcpNoDelay(bool on);
             void setReuseAddr(bool on);
@@ -47,6 +48,16 @@ inline int Socket::accept(InetAddress *peeraddr){
     struct sockaddr_in addr;
     memset(&addr, 0,sizeof(addr));
     int connfd = socket::accept(sockfd_, &addr);
+    if (connfd >= 0)
+    {
+        *peeraddr = addr;
+    }
+    return connfd;
+}
+inline int Socket::accept1(InetAddress *peeraddr){
+    struct sockaddr_in addr;
+    memset(&addr, 0,sizeof(addr));
+    int connfd = socket::accept1(sockfd_, &addr);
     if (connfd >= 0)
     {
         *peeraddr = addr;

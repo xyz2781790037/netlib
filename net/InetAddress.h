@@ -19,6 +19,7 @@ namespace mulib{
             }
             socklen_t getSockLen() const { return sizeof(addr_); };
             std::string toHostPort() const;
+            std::string toIpPort() const;
 
         private:
             sockaddr_in addr_;
@@ -44,6 +45,11 @@ inline InetAddress::InetAddress(const sockaddr_in &addr){
 inline std::string InetAddress::toHostPort() const{
     char buf[32];
     socket::toHostPort(buf, sizeof(buf), addr_);
+    return buf;
+}
+inline std::string InetAddress::toIpPort() const{
+    char buf[64] = "";
+    socket::toIpPort(buf, sizeof(buf), reinterpret_cast<const sockaddr *>(&getSockAddr()));
     return buf;
 }
 #endif
