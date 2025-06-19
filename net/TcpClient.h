@@ -24,7 +24,8 @@ namespace mulib{
             void connect();
             void disconnect();
             void stop();
-        
+            TcpClient::TcpConnectionPtr connection();
+
         private:
             void newConnection(int sockfd);
             void removeConnection(const TcpConnectionPtr &conn);

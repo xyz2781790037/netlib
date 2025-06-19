@@ -21,20 +21,30 @@ Epoller::~Epoller()
 }
 
 mulib::base::Timestamp Epoller::poll(int timeoutMs, ChannelList &activeChannels){
-    int numEvents = epoll_wait(epollfd_, events_.data(), events_.size(), timeoutMs);
     Timestamp now(Timestamp::now());
+    while(1){
+        int numEvents = epoll_wait(epollfd_, events_.data(), events_.size(), timeoutMs);
+        now = Timestamp::now();
     if(numEvents > 0){
         fillActiveChannels(numEvents, activeChannels);
         if(numEvents == events_.size()){
             events_.resize(2 * events_.size());
         }
+        break;
     }
     else if(numEvents == 0){
         LOG_INFO << "Epoller::epoll: nothing happend!";
+        break;
     }
     else{
-        LOG_WARN << "Epoller::epoll: ret < 0";
+        if (errno == EINTR) {
+            continue;  // 被信号打断，重试
+        }
+        LOG_WARN << "Epoller::epoll: ret < 0" << strerror(errno);
+        break;
     }
+    }
+    
     return now;
 }
 void Epoller::fillActiveChannels(int numEvents, ChannelList &activeChannels) const{
@@ -47,15 +57,26 @@ void Epoller::fillActiveChannels(int numEvents, ChannelList &activeChannels) con
 void Epoller::updateChannel(Channel *channel){
     assertInLoopThread();
     int index = channel->index();
-    if(index == _knew || index == _kdelete){
-        int fd = channel->fd();
-        if(index == _knew){
+    int fd = channel->fd();
+    if (index == _knew || index == _kdelete){
+        if (index == _knew)
+        {
             channels_[fd] = channel;
         }
         channel->set_index(_kadded);
         update(EPOLL_CTL_ADD, channel);
     }
+    else{
+        if (channel->isNoneEvent()){
+            update(EPOLL_CTL_DEL, channel);
+            channel->set_index(_kdelete);
+        }
+        else{
+            update(EPOLL_CTL_MOD, channel);
+        }
+    }
 }
+
 void Epoller::removeChannel(Channel *channel)
 {
     assertInLoopThread();
@@ -79,7 +100,7 @@ void Epoller::update(int opt, Channel *channel){
             LOG_ERROR << "Epoller::epoll : delete error";
         }
         else{
-            LOG_ERROR << "Epoller::epoll : add / mod error";
+            LOG_ERROR << "Epoller::epoll : add / mod error" << strerror(errno);
         }
     }
 }

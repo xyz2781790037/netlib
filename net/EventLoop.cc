@@ -76,7 +76,8 @@ void EventLoop::abortNotInLoopThread(){
 }
 void EventLoop::runInLoop(const Functor &cb)
 {
-    if(isInLoopThread()){
+    if (isInLoopThread())
+    {
         cb();
     }
     else{
@@ -97,7 +98,6 @@ void EventLoop::queueInLoop(const Functor &cb)
         std::lock_guard<std::mutex> lock(mutex_);
         pendingFunctors_.emplace_back(cb); // 加入待执行队列
     }
-
     // 如果不是在本线程，或者正在调用 functors（说明是嵌套），就唤醒 EventLoop
     if (!isInLoopThread() || callingPendingFunctors_)
     {
