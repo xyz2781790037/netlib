@@ -14,7 +14,7 @@ namespace mulib{
             using WriteCompleteCallback = std::function<void(const TcpConnectionPtr &)>;
             TcpClient(EventLoop *loop, const InetAddress &serverAddr);
             ~TcpClient();
-            void setConnectionCallback(const ConnectionCallback &cb) { connecitonCallback_ = cb; }
+            void setConnectionCallback(const ConnectionCallback &cb) { connectionCallback_ = cb; }
             void setMessageCallback(const MessageCallback &cb) { messageCallback_ = cb; }
             void setWriteCompleteCallback(const WriteCompleteCallback &cb) { writeCompleteCallback_ = cb; }
 
@@ -31,7 +31,7 @@ namespace mulib{
             int nextConnId_;
             EventLoop *loop_;
             ConnectorPtr connector_;
-            ConnectionCallback connecitonCallback_;
+            ConnectionCallback connectionCallback_;
             MessageCallback messageCallback_;
             WriteCompleteCallback writeCompleteCallback_;
 
