@@ -173,3 +173,12 @@ void TcpConnection::handleError(){
     LOG_ERROR << "TcpConnection::handleError [" << name_
               << "] - SO_ERROR = " << err << " " << strerror(err);
 }
+void TcpConnection::forceClose(){
+    if (state_ == kConnected || state_ == kDisconnecting){
+        setState(kDisconnecting);
+        loop_->runInLoop([self = shared_from_this()]()
+                         {
+                             self->handleClose();
+                         });
+    }
+}

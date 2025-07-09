@@ -145,6 +145,7 @@ void Connector::handleWrite(){
         assert(state_ == kDisconnected);
     }
 }
+const int Connector::kMaxRetryDelayMs;
 void Connector::retry(int sockfd){
     socket::close(sockfd);
     setState(kDisconnected);

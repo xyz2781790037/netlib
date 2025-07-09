@@ -5,6 +5,7 @@
 #include "Connector.h"
 #include "EventLoop.h"
 #include "SocketOps.h"
+#include "TcpConnection.h"
 #include <string>
 using namespace mulib::net;
 TcpClient::TcpClient(EventLoop *loop, const InetAddress &serverAddr)
@@ -76,5 +77,29 @@ void TcpClient::removeConnection(const TcpConnectionPtr &conn){
         LOG_INFO << "TcpClient::connect[" << this << "] - Reconnecting to "
                  << connector_->serverAddress().toHostPort();
         connector_->restart();
+    }
+}
+TcpClient::~TcpClient(){
+    LOG_INFO << "TcpClient::~TcpClient[" << this
+           << "] - connector " << static_cast<const void*>(connector_.get());
+    TcpConnectionPtr conn;
+    bool unique = false;
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        unique = connection_.unique();
+        conn = connection_;
+    }
+    if (conn){
+        assert(loop_ == conn->getLoop());
+        loop_->runInLoop([conn, loop = loop_, this]()
+                         { conn->setCloseCallback([loop, this](const TcpConnectionPtr &conn) { this->removeConnection(conn);  }); });
+        if (unique)
+        {
+            conn->forceClose();
+        }
+    }
+    else{
+        connector_->stop();
+        loop_->runAfter(1.0, [connector = connector_]() {});
     }
 }

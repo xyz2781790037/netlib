@@ -1,3 +1,6 @@
+#ifndef MUDUO_NET_TCPCLIENT_H
+#define MUDUO_NET_TCPCLIENT_H
+
 #include "TcpConnection.h"
 #include "../base/Timestamp.h"
 #include <mutex>
@@ -41,3 +44,4 @@ namespace mulib{
     }
     
 }
+#endif

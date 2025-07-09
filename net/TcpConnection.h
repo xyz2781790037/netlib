@@ -38,6 +38,7 @@ namespace mulib{
             void send(const std::string &message);
 
             void shutdown();
+            void forceClose();
 
         private:
             enum StateE

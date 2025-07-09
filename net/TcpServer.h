@@ -24,7 +24,7 @@ namespace mulib
 
         public:
             TcpServer(EventLoop *loop, std::string nameArg, const InetAddress &listenAddr);
-            ~TcpServer() {}
+            ~TcpServer();
 
             void start();
 

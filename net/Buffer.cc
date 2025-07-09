@@ -53,7 +53,7 @@ void Buffer::retrieveAll(){
     writerIndex_ = kCheapPrepend;
 }
 std::string Buffer::retrieveAllAsString(){
-    retrieveAsString(readableBytes());
+    return retrieveAsString(readableBytes());
 }
 std::string Buffer::retrieveAsString(size_t len){
     assert(len <= readableBytes());

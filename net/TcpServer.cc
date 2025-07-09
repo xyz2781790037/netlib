@@ -58,3 +58,11 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr &conn){
     subLoop->queueInLoop([conn]
                          { conn->connectDestroyed(); });
 } // 在对应的 EventLoop 中销毁该连接。
+TcpServer::~TcpServer() {
+    for (auto &item : connections_)
+    {
+        TcpConnectionPtr conn(item.second);
+        item.second.reset();
+        conn->getLoop()->runInLoop(std::bind(&TcpConnection::connectDestroyed, conn));
+    }
+}
